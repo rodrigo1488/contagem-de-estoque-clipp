@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
 import sqlite3
 from databases import CAMINHO_DB_LOCAL
+from license_validator import requer_licenca
 
 # Criando o Blueprint
 Route_editar_bp = Blueprint('Route_editar_bp', __name__)
 
 # Rota para editar um item coletado
 @Route_editar_bp.route("/editar/<int:item_id>", methods=["PUT"])
+@requer_licenca
 def editar_item(item_id):
     dados = request.json
     nova_quantidade = dados.get("quantidade")

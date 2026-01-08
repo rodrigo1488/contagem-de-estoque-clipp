@@ -10,7 +10,7 @@ Database_bp = Blueprint('Database_bp', __name__)
 # Configuração do Firebird
 DATABASE_CONFIG = {
     "host": "localhost",  # Ou IP do servidor Firebird
-    "database": "C:\Program Files (x86)\CompuFour\Clipp\Base\CLIPP.FDB",
+    "database": r"C:\Program Files (x86)\CompuFour\Clipp\Base\CLIPP.FDB",
     "user": "SYSDBA",
     "password": "masterkey",
     "charset": "UTF8"
@@ -34,18 +34,41 @@ CAMINHO_DB_LOCAL = "contagem_estoque.db"
 def inicializar_banco():
     conn = sqlite3.connect(CAMINHO_DB_LOCAL)
     cur = conn.cursor()
-    cur.execute("""
+    cur.executescript("""
             CREATE TABLE IF NOT EXISTS contagem_estoque (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             descricao TEXT,
             codigo_barras TEXT UNIQUE,
             quantidade INTEGER,
+            preco REAL,
             qnt_sist INTERGER,
             nome_user TEXT,
             data_hora timestamp
-                
-        
-        )
+        );
+
+        CREATE TABLE IF NOT EXISTS configuracoes (
+            chave TEXT PRIMARY KEY,
+            valor TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS historico_contagens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            data_finalizacao TIMESTAMP,
+            total_itens INTEGER,
+            valor_total REAL,
+            total_divergencias INTEGER
+        );
+
+        CREATE TABLE IF NOT EXISTS historico_itens (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_contagem INTEGER,
+            codigo_barras TEXT,
+            descricao TEXT,
+            quantidade INTEGER,
+            qnt_sist INTEGER,
+            preco REAL,
+            FOREIGN KEY(id_contagem) REFERENCES historico_contagens(id)
+        );
     """)
     conn.commit()
     conn.close()
@@ -63,5 +86,5 @@ def conectar_firebird():
         
         return conn
     except Exception as e:
-        
+        print(f"Erro ao conectar ao Firebird: {e}")
         return None

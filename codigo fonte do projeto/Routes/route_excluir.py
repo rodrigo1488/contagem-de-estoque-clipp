@@ -4,12 +4,14 @@ import sqlite3
 import os
 import datetime
 from databases import CAMINHO_DB_LOCAL
+from license_validator import requer_licenca
 
 
 Route_excluir_bp = Blueprint('Route_excluir_bp', __name__)
 
 # Rota para excluir um item coletado
 @Route_excluir_bp.route("/excluir/<int:item_id>", methods=["DELETE"])
+@requer_licenca
 def excluir_item(item_id):
     conn = sqlite3.connect(CAMINHO_DB_LOCAL)
     cursor = conn.cursor()
